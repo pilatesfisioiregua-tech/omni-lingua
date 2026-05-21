@@ -1,0 +1,9 @@
+# Exclude from Vercel deploy
+# These paths are not part of the web app:
+infra/                # Modal Python app (deployed separately with `modal deploy`)
+scripts/              # Build/dev scripts (run at build time, output already in dist)
+public/curriculum/proposals/  # Optional Agente Investigador outputs
+
+# Keep node_modules logic to Vercel default
+*.log
+.DS_Store
