@@ -1,5 +1,4 @@
 /** Generative Comprehensible Input · mini-historia 200pal personalizada · Diferenciador #2 · F4.8 stub */
-export const config = { runtime: 'edge' }
 
 export default async function handler(req: Request) {
   if (req.method !== 'POST') return new Response('method_not_allowed', { status: 405 })

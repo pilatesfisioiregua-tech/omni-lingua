@@ -1,5 +1,4 @@
 /** Coach IA chat dedicado · F4.8 · stub demo */
-export const config = { runtime: 'edge' }
 
 export default async function handler(req: Request) {
   if (req.method !== 'POST') {

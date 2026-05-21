@@ -1,5 +1,4 @@
 /** GOP (Goodness of Pronunciation) backend · Diferenciador #3 · F1+ stub */
-export const config = { runtime: 'edge' }
 
 export default async function handler(req: Request) {
   if (req.method !== 'POST') return new Response('method_not_allowed', { status: 405 })

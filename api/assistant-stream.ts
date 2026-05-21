@@ -4,7 +4,6 @@
  * F4.8 lo expandirá con tool use + Twin context inyectado.
  */
 
-export const config = { runtime: 'edge' }
 
 export default async function handler(req: Request) {
   if (req.method !== 'POST') {
