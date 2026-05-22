@@ -1,3 +1,4 @@
+import process from 'node:process'
 /** Quarterly Review · cada 30 días Claude analiza tu progreso global y emite review tipo coach humano */
 import Anthropic from '@anthropic-ai/sdk'
 

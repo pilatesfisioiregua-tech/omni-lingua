@@ -1,3 +1,4 @@
+import process from 'node:process'
 /** WeeklyPlanCard · Claude reorganiza prioridades semanales · F4 */
 import Anthropic from '@anthropic-ai/sdk'
 

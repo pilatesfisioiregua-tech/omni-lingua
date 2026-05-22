@@ -1,3 +1,4 @@
+import process from 'node:process'
 /** Cron mensual · Claude Sonnet busca updates curriculum · F4.7 */
 import Anthropic from '@anthropic-ai/sdk'
 

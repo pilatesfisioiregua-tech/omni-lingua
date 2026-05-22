@@ -1,3 +1,4 @@
+import process from 'node:process'
 /**
  * Assistant sidebar endpoint · Anthropic streaming (modo demo si falta key).
  *

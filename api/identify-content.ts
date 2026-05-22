@@ -1,3 +1,4 @@
+import process from 'node:process'
 /**
  * ACRCloud audio identification · F4.5.
  *

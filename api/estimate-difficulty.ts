@@ -1,3 +1,4 @@
+import process from 'node:process'
 /** LLM estima CEFR de un transcript · F4.5 */
 import Anthropic from '@anthropic-ai/sdk'
 

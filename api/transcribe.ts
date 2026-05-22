@@ -1,3 +1,4 @@
+import process from 'node:process'
 /** Modal Whisper transcribe · F4.5 stub */
 
 export default async function handler(req: Request) {
