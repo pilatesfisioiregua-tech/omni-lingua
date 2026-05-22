@@ -12,8 +12,6 @@
 import crypto from 'node:crypto'
 import { Buffer } from 'node:buffer'
 
-export const config = { runtime: 'nodejs20.x' }
-
 type AcrMusic = {
   title?: string
   artists?: { name: string }[]
@@ -94,7 +92,7 @@ export default async function handler(req: Request): Promise<Response> {
       headers: {
         'content-type': `multipart/form-data; boundary=${boundary}`,
       },
-      body,
+      body: new Uint8Array(body),
     })
     const data = (await res.json()) as { status?: { code: number; msg: string }; metadata?: { music?: AcrMusic[] } }
 
