@@ -10,6 +10,7 @@ import { FrustrationModal } from './FrustrationModal'
 import { Dashboard } from './Dashboard'
 import { WeeklyPlanCard } from './WeeklyPlanCard'
 import { PainCheckIn } from './PainCheckIn'
+import { CurriculumUpdater } from './CurriculumUpdater'
 
 type View = 'loading' | 'onboarding' | 'home' | 'lesson'
 
@@ -17,7 +18,7 @@ export function Practice() {
   const [view, setView] = useState<View>('loading')
   const [activeLesson, setActiveLesson] = useState<Lesson | null>(null)
   const [showFrustration, setShowFrustration] = useState(false)
-  const [section, setSection] = useState<'dashboard' | 'lessons' | 'plan' | 'wellness'>('dashboard')
+  const [section, setSection] = useState<'dashboard' | 'lessons' | 'plan' | 'wellness' | 'curriculum'>('dashboard')
 
   useEffect(() => {
     void (async () => {
@@ -88,6 +89,7 @@ export function Practice() {
         <Tab active={section === 'lessons'} onClick={() => setSection('lessons')}>Lessons</Tab>
         <Tab active={section === 'plan'} onClick={() => setSection('plan')}>Plan semanal</Tab>
         <Tab active={section === 'wellness'} onClick={() => setSection('wellness')}>Bienestar</Tab>
+        <Tab active={section === 'curriculum'} onClick={() => setSection('curriculum')}>Curriculum</Tab>
       </div>
 
       {section === 'dashboard' && <Dashboard />}
@@ -132,6 +134,8 @@ export function Practice() {
       {section === 'plan' && <WeeklyPlanCard />}
 
       {section === 'wellness' && <PainCheckIn />}
+
+      {section === 'curriculum' && <CurriculumUpdater />}
     </div>
   )
 }
