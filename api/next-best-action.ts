@@ -1,9 +1,10 @@
+import { env } from './_env'
 /** Cross-skill recommendation engine · sugiere acción óptima basada en Twin + estado */
 import Anthropic from '@anthropic-ai/sdk'
 
 export default async function handler(req: Request): Promise<Response> {
   if (req.method !== 'POST') return new Response('method_not_allowed', { status: 405 })
-  const key = process.env.ANTHROPIC_API_KEY
+  const key = env('ANTHROPIC_API_KEY')
   if (!key) return json(demoFallback())
 
   type Body = { twin?: unknown; objective?: string; minutesAvailable?: number; recentSkills?: string[] }

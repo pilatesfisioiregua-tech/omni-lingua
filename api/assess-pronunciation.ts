@@ -1,8 +1,9 @@
+import { env } from './_env'
 /** GOP (Goodness of Pronunciation) backend · Diferenciador #3 · F1+ stub */
 
 export default async function handler(req: Request) {
   if (req.method !== 'POST') return new Response('method_not_allowed', { status: 405 })
-  if (!process.env.MODAL_GOP_ENDPOINT) {
+  if (!env('MODAL_GOP_ENDPOINT')) {
     return new Response(
       JSON.stringify({
         demo: true,

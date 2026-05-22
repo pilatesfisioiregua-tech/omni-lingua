@@ -1,3 +1,4 @@
+import { env } from './_env'
 /**
  * ACRCloud audio identification · F4.5.
  *
@@ -25,9 +26,9 @@ export default async function handler(req: Request): Promise<Response> {
     return json(405, { error: 'method_not_allowed' })
   }
 
-  const host = process.env.ACRCLOUD_HOST
-  const key = process.env.ACRCLOUD_KEY
-  const secret = process.env.ACRCLOUD_SECRET
+  const host = env('ACRCLOUD_HOST')
+  const key = env('ACRCLOUD_KEY')
+  const secret = env('ACRCLOUD_SECRET')
   if (!host || !key || !secret) {
     return json(200, {
       matched: false,

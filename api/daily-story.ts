@@ -1,9 +1,10 @@
+import { env } from './_env'
 /** Generative Comprehensible Input · mini-historia 200pal personalizada · Diferenciador #2 */
 import Anthropic from '@anthropic-ai/sdk'
 
 export default async function handler(req: Request): Promise<Response> {
   if (req.method !== 'POST') return new Response('method_not_allowed', { status: 405 })
-  const key = process.env.ANTHROPIC_API_KEY
+  const key = env('ANTHROPIC_API_KEY')
   if (!key) return demoFallback()
 
   type Body = { level?: string; vocabFocus?: string[]; themes?: string[] }

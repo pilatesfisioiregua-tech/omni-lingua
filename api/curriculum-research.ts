@@ -1,8 +1,9 @@
+import { env } from './_env'
 /** Cron mensual · Claude Sonnet busca updates curriculum · F4.7 */
 import Anthropic from '@anthropic-ai/sdk'
 
 export default async function handler(_req: Request): Promise<Response> {
-  const key = process.env.ANTHROPIC_API_KEY
+  const key = env('ANTHROPIC_API_KEY')
   if (!key) {
     return json({ ok: true, proposed_changes: [], message: 'demo · sin API key' })
   }

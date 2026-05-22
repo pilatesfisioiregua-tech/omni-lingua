@@ -1,3 +1,4 @@
+import { env } from './_env'
 /**
  * Assistant sidebar endpoint · Anthropic streaming (modo demo si falta key).
  *
@@ -13,7 +14,7 @@ export default async function handler(req: Request) {
     })
   }
 
-  const key = process.env.ANTHROPIC_API_KEY
+  const key = env('ANTHROPIC_API_KEY')
   if (!key) {
     return new Response(
       JSON.stringify({

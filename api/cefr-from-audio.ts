@@ -1,9 +1,10 @@
+import { env } from './_env'
 /** CEFR auto-detect desde 1 grabación 30s · usado en Onboarding paso 4 */
 import Anthropic from '@anthropic-ai/sdk'
 
 export default async function handler(req: Request): Promise<Response> {
   if (req.method !== 'POST') return new Response('method_not_allowed', { status: 405 })
-  const key = process.env.ANTHROPIC_API_KEY
+  const key = env('ANTHROPIC_API_KEY')
   if (!key) return json({ cefr: 'A1', confidence: 'low', rationale: 'demo · sin API key', fluency: 0, accent: 0 })
 
   type Body = { transcript?: string }
