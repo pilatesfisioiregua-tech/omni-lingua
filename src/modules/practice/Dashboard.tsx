@@ -3,6 +3,7 @@ import { TrendingUp, AlertTriangle, Activity, Calendar, Target } from 'lucide-re
 import { practiceDb, recentLessonHistory, recentPain, streakDays, type Prefs, getPrefs, type WeeklyPlan, getCurrentWeekPlan } from './practiceDb'
 import { getTwinContext, type TwinContext } from '../../shared/twin/twinContext'
 import { SKILLS } from './curriculumData'
+import { NextBestAction } from './NextBestAction'
 
 type Insight = { tag: 'honest' | 'win'; text: string }
 
@@ -38,6 +39,8 @@ export function Dashboard() {
 
   return (
     <div className="space-y-6">
+      <NextBestAction />
+
       <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <Stat icon={<Calendar className="h-4 w-4" />} label="Streak" value={`${streak} días`} />
         <Stat icon={<Target className="h-4 w-4" />} label="CEFR efectivo" value={twin?.effectiveCefr ?? '—'} hint={prefs?.cefrSelfReport ? `vs self-report ${prefs.cefrSelfReport}` : undefined} />

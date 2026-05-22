@@ -1,8 +1,9 @@
-import { useState } from 'react'
-import { ChevronRight, ChevronLeft, Sparkles } from 'lucide-react'
+import { useRef, useState } from 'react'
+import { ChevronRight, ChevronLeft, Sparkles, Mic, Square, Loader2 } from 'lucide-react'
 import { clsx } from 'clsx'
 import { ICON_CONTENTS } from './curriculumData'
 import { savePrefs } from './practiceDb'
+import { Recognizer, isAsrSupported } from '../../shared/speech/WebSpeechRecognition'
 
 type Props = {
   onComplete: () => void
@@ -31,9 +32,62 @@ export function OnboardingWizard({ onComplete }: Props) {
   const [objective, setObjective] = useState('conversational')
   const [cefrSelf, setCefrSelf] = useState('A1')
   const [wishlist, setWishlist] = useState<string[]>([])
+  const [recordingMode, setRecordingMode] = useState<'self' | 'audio'>('self')
+  const [recording, setRecording] = useState(false)
+  const [transcript, setTranscript] = useState('')
+  const [analyzing, setAnalyzing] = useState(false)
+  const [audioResult, setAudioResult] = useState<{
+    cefr: string
+    rationale: string
+    fluency?: number
+    accent_clarity?: number
+  } | null>(null)
+  const recRef = useRef<Recognizer | null>(null)
 
   const next = () => setStep((s) => s + 1)
   const prev = () => setStep((s) => Math.max(0, s - 1))
+
+  const startRecord = () => {
+    if (!isAsrSupported()) return
+    try {
+      const rec = new Recognizer({ lang: 'en-US', continuous: true, interim: true })
+      recRef.current = rec
+      setTranscript('')
+      setAudioResult(null)
+      setRecording(true)
+      let acc = ''
+      rec.onResult((r) => {
+        if (r.isFinal) {
+          acc += (acc ? ' ' : '') + r.transcript.trim()
+          setTranscript(acc)
+        } else {
+          setTranscript(acc + (acc ? ' ' : '') + r.transcript)
+        }
+      })
+      rec.onError(() => setRecording(false))
+      rec.start()
+    } catch {
+      setRecording(false)
+    }
+  }
+
+  const stopRecord = async () => {
+    recRef.current?.stop()
+    setRecording(false)
+    if (!transcript.trim()) return
+    setAnalyzing(true)
+    try {
+      const res = await fetch('/api/cefr-from-audio', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ transcript }),
+      })
+      const data = await res.json()
+      setAudioResult(data)
+    } finally {
+      setAnalyzing(false)
+    }
+  }
 
   const finish = async () => {
     await savePrefs({
@@ -42,7 +96,7 @@ export function OnboardingWizard({ onComplete }: Props) {
       minutesPerSession: minutes,
       objective,
       cefrSelfReport: cefrSelf,
-      cefrAutoDetect: null,
+      cefrAutoDetect: audioResult?.cefr ?? null,
       wishlistContentIds: wishlist,
     })
     onComplete()
@@ -125,30 +179,120 @@ export function OnboardingWizard({ onComplete }: Props) {
         )}
 
         {step === 3 && (
-          <div className="space-y-3">
-            <h2 className="font-serif text-xl text-canvas-900">¿Cómo crees que está tu inglés ahora?</h2>
-            <p className="text-xs text-canvas-500">
-              Tu auto-percepción. El sistema medirá tu nivel real (Honest Dashboard) en las próximas
-              semanas y te dirá si coincide.
-            </p>
-            <div className="space-y-2">
-              {SELF_REPORT_CEFR.map((c) => (
-                <button
-                  key={c.id}
-                  type="button"
-                  onClick={() => setCefrSelf(c.id)}
-                  className={clsx(
-                    'flex w-full items-center justify-between rounded-lg border bg-canvas-50 p-3 text-left transition',
-                    cefrSelf === c.id ? 'border-accent-500 bg-accent-100/50' : 'border-canvas-200 hover:border-accent-300',
-                  )}
-                >
-                  <div>
-                    <div className="font-medium text-canvas-900">{c.label}</div>
-                    <div className="text-xs text-canvas-500">{c.description}</div>
-                  </div>
-                </button>
-              ))}
+          <div className="space-y-4">
+            <h2 className="font-serif text-xl text-canvas-900">¿Cómo está tu inglés ahora?</h2>
+
+            <div className="flex gap-2 border-b border-canvas-200">
+              <button
+                type="button"
+                onClick={() => setRecordingMode('audio')}
+                className={clsx(
+                  '-mb-px border-b-2 px-3 py-2 text-sm',
+                  recordingMode === 'audio'
+                    ? 'border-accent-500 text-accent-700'
+                    : 'border-transparent text-canvas-500',
+                )}
+              >
+                🎤 Habla 30s (recomendado)
+              </button>
+              <button
+                type="button"
+                onClick={() => setRecordingMode('self')}
+                className={clsx(
+                  '-mb-px border-b-2 px-3 py-2 text-sm',
+                  recordingMode === 'self'
+                    ? 'border-accent-500 text-accent-700'
+                    : 'border-transparent text-canvas-500',
+                )}
+              >
+                Auto-reportar
+              </button>
             </div>
+
+            {recordingMode === 'audio' ? (
+              <div className="space-y-3">
+                <p className="text-xs text-canvas-500">
+                  Pulsa "Grabar" y preséntate en inglés durante 30 segundos: nombre, de dónde eres,
+                  qué haces, por qué quieres mejorar tu inglés. Claude evalúa tu CEFR real (mucho
+                  más preciso que el self-report).
+                </p>
+                <div className="flex items-center gap-3">
+                  {!recording ? (
+                    <button
+                      type="button"
+                      onClick={startRecord}
+                      disabled={!isAsrSupported() || analyzing}
+                      className="inline-flex items-center gap-2 rounded-md bg-accent-500 px-4 py-2 text-sm font-medium text-white hover:bg-accent-700 disabled:opacity-40"
+                    >
+                      <Mic className="h-4 w-4" />
+                      {analyzing ? 'Analizando…' : 'Grabar 30s'}
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => void stopRecord()}
+                      className="inline-flex items-center gap-2 rounded-md bg-danger px-4 py-2 text-sm font-medium text-white"
+                    >
+                      <Square className="h-4 w-4" /> Parar + evaluar
+                    </button>
+                  )}
+                  {analyzing && <Loader2 className="h-4 w-4 animate-spin text-canvas-500" />}
+                </div>
+                {transcript && (
+                  <div className="rounded-lg bg-canvas-100 p-3 text-sm text-canvas-900">
+                    <div className="text-[10px] uppercase tracking-wider text-canvas-500">Tu transcript</div>
+                    {transcript}
+                  </div>
+                )}
+                {audioResult && (
+                  <div className="rounded-xl border border-accent-500 bg-accent-100/50 p-4">
+                    <div className="mb-1 text-[10px] uppercase tracking-wider text-accent-700">
+                      Evaluación Claude
+                    </div>
+                    <div className="font-serif text-3xl text-accent-700">{audioResult.cefr}</div>
+                    {(audioResult.fluency !== undefined || audioResult.accent_clarity !== undefined) && (
+                      <div className="mt-1 flex gap-3 text-xs text-canvas-700">
+                        {audioResult.fluency !== undefined && <span>Fluidez: {audioResult.fluency}/100</span>}
+                        {audioResult.accent_clarity !== undefined && <span>Claridad acento: {audioResult.accent_clarity}/100</span>}
+                      </div>
+                    )}
+                    <p className="mt-2 text-xs italic text-canvas-700">{audioResult.rationale}</p>
+                    <div className="mt-2 text-[10px] text-canvas-500">
+                      Este será tu nivel inicial · el sistema lo refinará usándote.
+                    </div>
+                  </div>
+                )}
+                {!isAsrSupported() && (
+                  <p className="text-xs text-warning">
+                    Tu navegador no soporta Web Speech. Usa Chrome/Edge desktop o cambia a auto-reportar.
+                  </p>
+                )}
+              </div>
+            ) : (
+              <>
+                <p className="text-xs text-canvas-500">
+                  Tu auto-percepción. El sistema medirá tu nivel real con el uso.
+                </p>
+                <div className="space-y-2">
+                  {SELF_REPORT_CEFR.map((c) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      onClick={() => setCefrSelf(c.id)}
+                      className={clsx(
+                        'flex w-full items-center justify-between rounded-lg border bg-canvas-50 p-3 text-left transition',
+                        cefrSelf === c.id ? 'border-accent-500 bg-accent-100/50' : 'border-canvas-200 hover:border-accent-300',
+                      )}
+                    >
+                      <div>
+                        <div className="font-medium text-canvas-900">{c.label}</div>
+                        <div className="text-xs text-canvas-500">{c.description}</div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         )}
 
