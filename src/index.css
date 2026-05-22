@@ -49,3 +49,19 @@ h3 {
   font-weight: 600;
   letter-spacing: -0.01em;
 }
+
+/* Dark mode · tinte coral · respeta personalidad Omni-Lingua */
+html[data-theme='dark'] {
+  --color-canvas-50: #1f1c18;
+  --color-canvas-100: #16140f;
+  --color-canvas-200: #2a2620;
+  --color-canvas-300: #3a342c;
+  --color-canvas-500: #8a8678;
+  --color-canvas-700: #c8c3b3;
+  --color-canvas-900: #f0eee6;
+  --color-accent-100: #2a1b13;
+  --color-accent-300: #6b3825;
+  --color-accent-500: #cc785c;
+  --color-accent-700: #e8a38e;
+  --color-accent-900: #f7e2d9;
+}

@@ -10,6 +10,7 @@ import {
   Bot,
   Camera,
   Sparkles,
+  Settings as SettingsIcon,
   Loader2,
 } from 'lucide-react'
 
@@ -36,6 +37,9 @@ const Coach = lazy(() => import('../modules/coach/Coach').then((m) => ({ default
 const Performance = lazy(() =>
   import('../modules/performance/Performance').then((m) => ({ default: m.Performance })),
 )
+const Settings = lazy(() =>
+  import('../modules/settings/Settings').then((m) => ({ default: m.Settings })),
+)
 
 function withSuspense(Comp: ComponentType): ComponentType {
   const Wrapped = () => (
@@ -54,7 +58,7 @@ function withSuspense(Comp: ComponentType): ComponentType {
   return Wrapped
 }
 
-export type Phase = '0' | '1' | '2' | '3' | '4' | '4.5' | '4.6' | '4.8' | '4.9'
+export type Phase = '0' | '1' | '2' | '3' | '4' | '4.5' | '4.6' | '4.8' | '4.9' | '5'
 
 export type RouteDef = {
   path: string
@@ -63,7 +67,7 @@ export type RouteDef = {
   icon: LucideIcon
   phase: Phase
   component: React.ComponentType
-  group: 'foundation' | 'tools' | 'learn' | 'content' | 'lab'
+  group: 'foundation' | 'tools' | 'learn' | 'content' | 'lab' | 'system'
   tagline: string
 }
 
@@ -158,6 +162,16 @@ export const ROUTES: RouteDef[] = [
     group: 'lab',
     tagline: 'MediaPipe lips · GOP visual · autocrítica IA anti self-delusion',
   },
+  {
+    path: '/settings',
+    label: 'Ajustes',
+    shortLabel: 'Ajustes',
+    icon: SettingsIcon,
+    phase: '5',
+    component: withSuspense(Settings),
+    group: 'system',
+    tagline: 'Theme · cronotipo (#10) · export JSON · subtitle companion (#8)',
+  },
 ]
 
 export const GROUP_LABELS: Record<RouteDef['group'], string> = {
@@ -166,4 +180,5 @@ export const GROUP_LABELS: Record<RouteDef['group'], string> = {
   learn: 'Aprender',
   content: 'Contenido real',
   lab: 'Laboratorio',
+  system: 'Sistema',
 }

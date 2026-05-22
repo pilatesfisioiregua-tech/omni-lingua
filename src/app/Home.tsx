@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { ArrowRight, Sparkles } from 'lucide-react'
 import { ROUTES, GROUP_LABELS, type RouteDef } from './routes'
 
-const groups = (['foundation', 'tools', 'learn', 'content', 'lab'] as const).map((group) => ({
+const groups = (['foundation', 'tools', 'learn', 'content', 'lab', 'system'] as const).map((group) => ({
   group,
   label: GROUP_LABELS[group],
   routes: ROUTES.filter((r: RouteDef) => r.group === group),

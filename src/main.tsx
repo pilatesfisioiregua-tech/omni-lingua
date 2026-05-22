@@ -5,6 +5,9 @@ import './index.css'
 import { Layout } from './app/Layout'
 import { Home } from './app/Home'
 import { ROUTES } from './app/routes'
+import { applyTheme, getTheme } from './shared/theme/themeStore'
+
+applyTheme(getTheme())
 
 const router = createBrowserRouter([
   {
