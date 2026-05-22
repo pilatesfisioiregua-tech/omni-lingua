@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowLeft, Moon, Sun, Download, Clock, Settings as SettingsIcon } from 'lucide-react'
+import { ArrowLeft, Moon, Sun, Download, Clock, Settings as SettingsIcon, Bell, BellOff } from 'lucide-react'
+import { requestNotificationPermission } from '../../shared/notifications/notify'
 import { clsx } from 'clsx'
 import { getTheme, setTheme, type Theme } from '../../shared/theme/themeStore'
 import { practiceDb } from '../practice/practiceDb'
@@ -14,6 +15,9 @@ export function Settings() {
   const [theme, setThemeState] = useState<Theme>(getTheme())
   const [cronotype, setCronotype] = useState<Cronotype>((localStorage.getItem(CRONOTYPE_KEY) as Cronotype) ?? 'unknown')
   const [exporting, setExporting] = useState(false)
+  const [notifPerm, setNotifPerm] = useState<NotificationPermission>(
+    typeof Notification !== 'undefined' ? Notification.permission : 'denied',
+  )
 
   const toggleTheme = (t: Theme) => {
     setTheme(t)
@@ -86,6 +90,29 @@ export function Settings() {
           <Btn active={theme === 'dark'} onClick={() => toggleTheme('dark')} icon={<Moon className="h-4 w-4" />}>
             Dark con tinte coral
           </Btn>
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-canvas-200 bg-canvas-50 p-5">
+        <div className="mb-3 flex items-center gap-2">
+          {notifPerm === 'granted' ? <Bell className="h-4 w-4 text-accent-500" /> : <BellOff className="h-4 w-4 text-canvas-500" />}
+          <h2 className="font-serif text-lg text-canvas-900">Notificaciones</h2>
+        </div>
+        <p className="mb-3 text-xs text-canvas-500">
+          1 recordatorio al día en tu hora cronotípica · solo cuando la app esté abierta o cuando
+          regreses durante esa franja. Privacy first · sin servidor push externo.
+        </p>
+        <div className="flex items-center gap-3 text-sm">
+          <span className="rounded bg-canvas-200 px-2 py-0.5 font-mono text-xs">{notifPerm}</span>
+          {notifPerm !== 'granted' && (
+            <button
+              type="button"
+              onClick={async () => setNotifPerm(await requestNotificationPermission())}
+              className="rounded-md bg-accent-500 px-3 py-1 text-xs text-white hover:bg-accent-700"
+            >
+              Permitir notificaciones
+            </button>
+          )}
         </div>
       </section>
 

@@ -11,6 +11,7 @@ import { Dashboard } from './Dashboard'
 import { WeeklyPlanCard } from './WeeklyPlanCard'
 import { PainCheckIn } from './PainCheckIn'
 import { CurriculumUpdater } from './CurriculumUpdater'
+import { QuarterlyReview } from './QuarterlyReview'
 
 type View = 'loading' | 'onboarding' | 'home' | 'lesson'
 
@@ -18,7 +19,7 @@ export function Practice() {
   const [view, setView] = useState<View>('loading')
   const [activeLesson, setActiveLesson] = useState<Lesson | null>(null)
   const [showFrustration, setShowFrustration] = useState(false)
-  const [section, setSection] = useState<'dashboard' | 'lessons' | 'plan' | 'wellness' | 'curriculum'>('dashboard')
+  const [section, setSection] = useState<'dashboard' | 'lessons' | 'plan' | 'wellness' | 'curriculum' | 'review'>('dashboard')
 
   useEffect(() => {
     void (async () => {
@@ -90,6 +91,7 @@ export function Practice() {
         <Tab active={section === 'plan'} onClick={() => setSection('plan')}>Plan semanal</Tab>
         <Tab active={section === 'wellness'} onClick={() => setSection('wellness')}>Bienestar</Tab>
         <Tab active={section === 'curriculum'} onClick={() => setSection('curriculum')}>Curriculum</Tab>
+        <Tab active={section === 'review'} onClick={() => setSection('review')}>Review 30d</Tab>
       </div>
 
       {section === 'dashboard' && <Dashboard />}
@@ -136,6 +138,8 @@ export function Practice() {
       {section === 'wellness' && <PainCheckIn />}
 
       {section === 'curriculum' && <CurriculumUpdater />}
+
+      {section === 'review' && <QuarterlyReview />}
     </div>
   )
 }

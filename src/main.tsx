@@ -6,8 +6,10 @@ import { Layout } from './app/Layout'
 import { Home } from './app/Home'
 import { ROUTES } from './app/routes'
 import { applyTheme, getTheme } from './shared/theme/themeStore'
+import { maybeNotifyOnStart } from './shared/notifications/notify'
 
 applyTheme(getTheme())
+void maybeNotifyOnStart()
 
 const router = createBrowserRouter([
   {
