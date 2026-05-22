@@ -1,4 +1,4 @@
-import { env } from './_env.js'
+function env(name: string): string | undefined { const g = globalThis as { process?: { env: Record<string, string | undefined> } }; return g.process?.env?.[name] }
 /** Cron mensual · Claude Sonnet busca updates curriculum · F4.7 */
 import Anthropic from '@anthropic-ai/sdk'
 

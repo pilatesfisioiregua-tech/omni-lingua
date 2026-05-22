@@ -1,4 +1,4 @@
-import { env } from './_env.js'
+function env(name: string): string | undefined { const g = globalThis as { process?: { env: Record<string, string | undefined> } }; return g.process?.env?.[name] }
 /** Modal Whisper transcribe · F4.5 stub */
 
 export default async function handler(req: Request) {

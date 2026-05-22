@@ -1,4 +1,4 @@
-import { env } from './_env.js'
+function env(name: string): string | undefined { const g = globalThis as { process?: { env: Record<string, string | undefined> } }; return g.process?.env?.[name] }
 /** CEFR auto-detect desde 1 grabación 30s · usado en Onboarding paso 4 */
 import Anthropic from '@anthropic-ai/sdk'
 

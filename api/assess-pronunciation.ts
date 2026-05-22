@@ -1,4 +1,4 @@
-import { env } from './_env.js'
+function env(name: string): string | undefined { const g = globalThis as { process?: { env: Record<string, string | undefined> } }; return g.process?.env?.[name] }
 /** GOP (Goodness of Pronunciation) backend · Diferenciador #3 · F1+ stub */
 
 export default async function handler(req: Request) {
