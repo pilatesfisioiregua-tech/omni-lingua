@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { ArrowLeft, ArrowRight, CheckCircle2, Frown } from 'lucide-react'
 import type { Lesson, LessonStep } from './curriculumData'
 import { rateSkill, recordLessonComplete } from './practiceDb'
-import { recordInterferenceES } from '../../shared/twin/twinAggregator'
+import { recordInterferenceES, recordErrorPattern } from '../../shared/twin/twinAggregator'
 
 type Props = {
   lesson: Lesson
@@ -232,10 +232,44 @@ function GuidedStep({ prompt, expected }: { prompt: string; expected: string }) 
   )
 }
 
+type CorrectResponse = {
+  corrected?: string
+  diff?: { original: string; fix: string; type: string }[]
+  pedagogical_explanation?: string
+  errors_for_fsrs?: { tag: string; produced: string; target: string }[]
+}
+
 function WritingStep({ prompt, sampleAnswer }: { prompt: string; sampleAnswer: string }) {
   const [text, setText] = useState('')
   const [submitted, setSubmitted] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [result, setResult] = useState<CorrectResponse | null>(null)
   const wordCount = text.split(/\s+/).filter(Boolean).length
+
+  const submit = async () => {
+    setSubmitted(true)
+    setLoading(true)
+    try {
+      const res = await fetch('/api/correct-writing', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ text, level: 'A2' }),
+      })
+      const data = (await res.json()) as CorrectResponse
+      setResult(data)
+      // Inyectar errores al Twin · recordErrorPattern via aggregator
+      if (Array.isArray(data.errors_for_fsrs)) {
+        for (const e of data.errors_for_fsrs) {
+          await recordErrorPattern('grammar', e.produced, e.target, e.tag)
+        }
+      }
+    } catch (e) {
+      setResult({ pedagogical_explanation: 'Error: ' + (e instanceof Error ? e.message : String(e)) })
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="space-y-3">
       <p className="text-sm text-canvas-900">{prompt}</p>
@@ -251,28 +285,60 @@ function WritingStep({ prompt, sampleAnswer }: { prompt: string; sampleAnswer: s
         {!submitted ? (
           <button
             type="button"
-            onClick={() => setSubmitted(true)}
+            onClick={submit}
             disabled={text.length < 10}
             className="rounded-md bg-accent-500 px-3 py-1 text-white hover:bg-accent-700 disabled:opacity-40"
           >
             Enviar para feedback
           </button>
         ) : (
-          <span className="text-success">✓ Enviado</span>
+          <span className="text-success">{loading ? '…' : '✓ Enviado'}</span>
         )}
       </div>
-      {submitted && (
+      {loading && (
+        <div className="rounded-lg bg-canvas-100 p-3 text-xs italic text-canvas-500">
+          Claude está revisando tu texto…
+        </div>
+      )}
+      {result && !loading && (
         <div className="space-y-2 rounded-lg border border-canvas-200 bg-canvas-100 p-3 text-sm">
           <div className="text-xs uppercase tracking-wider text-canvas-500">
             Diferenciador #6 · Write→AI→Diff→Retry
           </div>
-          <p className="text-canvas-700">
-            En modo demo el feedback IA no está activo. Con ANTHROPIC_API_KEY el endpoint{' '}
-            <code className="rounded bg-canvas-200 px-1">/api/correct-writing</code> devolverá un
-            diff línea-por-línea con explicación pedagógica + extracción de errores para FSRS.
-          </p>
+          {result.corrected && (
+            <div>
+              <div className="text-[10px] uppercase tracking-wider text-success">Versión corregida</div>
+              <p className="text-canvas-900">{result.corrected}</p>
+            </div>
+          )}
+          {result.pedagogical_explanation && (
+            <div>
+              <div className="text-[10px] uppercase tracking-wider text-canvas-500">Explicación</div>
+              <p className="text-canvas-700">{result.pedagogical_explanation}</p>
+            </div>
+          )}
+          {result.diff && result.diff.length > 0 && (
+            <div>
+              <div className="text-[10px] uppercase tracking-wider text-canvas-500">Diffs</div>
+              <ul className="space-y-1 text-xs">
+                {result.diff.map((d, i) => (
+                  <li key={i} className="flex items-baseline gap-2">
+                    <span className="rounded bg-danger/10 px-1 text-danger line-through">{d.original}</span>
+                    →
+                    <span className="rounded bg-success/10 px-1 text-success">{d.fix}</span>
+                    <span className="text-[10px] uppercase tracking-wider text-canvas-500">{d.type}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {result.errors_for_fsrs && result.errors_for_fsrs.length > 0 && (
+            <div className="text-[11px] text-canvas-500">
+              ✓ {result.errors_for_fsrs.length} errores entran a tu FSRS · te aparecerán antes de olvidarlos.
+            </div>
+          )}
           <details className="text-xs text-canvas-500">
-            <summary className="cursor-pointer">Ver respuesta de ejemplo</summary>
+            <summary className="cursor-pointer">Ver respuesta de ejemplo del profesor</summary>
             <p className="mt-2 italic">{sampleAnswer}</p>
           </details>
         </div>

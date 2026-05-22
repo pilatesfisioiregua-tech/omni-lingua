@@ -1,13 +1,19 @@
 import { useEffect, useState } from 'react'
-import { CalendarDays, Save } from 'lucide-react'
-import { getCurrentWeekPlan, saveWeekPlan } from './practiceDb'
+import { CalendarDays, Save, Wand2, Loader2 } from 'lucide-react'
+import { getCurrentWeekPlan, saveWeekPlan, getPrefs } from './practiceDb'
 import { SKILLS } from './curriculumData'
+import { getTwinContext } from '../../shared/twin/twinContext'
+
+type AdaptedItem = { day: string; activity: string; minutes: number; skillId?: string | null }
 
 export function WeeklyPlanCard() {
   const [hours, setHours] = useState(3)
   const [notes, setNotes] = useState('')
   const [priorities, setPriorities] = useState<string[]>([])
   const [saved, setSaved] = useState(false)
+  const [adapting, setAdapting] = useState(false)
+  const [adapted, setAdapted] = useState<AdaptedItem[]>([])
+  const [adaptedRationale, setAdaptedRationale] = useState('')
 
   useEffect(() => {
     void (async () => {
@@ -23,6 +29,34 @@ export function WeeklyPlanCard() {
   const togglePriority = (id: string) => {
     setPriorities((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
     setSaved(false)
+  }
+
+  const adapt = async () => {
+    setAdapting(true)
+    setAdapted([])
+    setAdaptedRationale('')
+    try {
+      const twin = await getTwinContext()
+      const prefs = await getPrefs()
+      const res = await fetch('/api/plan-adapt', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          hoursAvailable: hours,
+          notes,
+          currentPriorities: priorities.map((p) => SKILLS.find((s) => s.id === p)?.title ?? p),
+          twin,
+          objective: prefs?.objective ?? 'conversational',
+        }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (Array.isArray(data.adapted_plan)) setAdapted(data.adapted_plan)
+      if (data.rationale) setAdaptedRationale(data.rationale)
+    } catch (e) {
+      setAdaptedRationale('Error: ' + (e instanceof Error ? e.message : String(e)))
+    } finally {
+      setAdapting(false)
+    }
   }
 
   const save = async () => {
@@ -94,13 +128,44 @@ export function WeeklyPlanCard() {
         </div>
       </div>
 
-      <button
-        type="button"
-        onClick={save}
-        className="inline-flex items-center gap-2 rounded-md bg-accent-500 px-4 py-2 text-sm font-medium text-white hover:bg-accent-700"
-      >
-        <Save className="h-3 w-3" /> {saved ? 'Guardado ✓' : 'Guardar plan semanal'}
-      </button>
+      <div className="flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={save}
+          className="inline-flex items-center gap-2 rounded-md bg-accent-500 px-4 py-2 text-sm font-medium text-white hover:bg-accent-700"
+        >
+          <Save className="h-3 w-3" /> {saved ? 'Guardado ✓' : 'Guardar plan semanal'}
+        </button>
+        <button
+          type="button"
+          onClick={adapt}
+          disabled={adapting}
+          className="inline-flex items-center gap-2 rounded-md border border-accent-500 bg-accent-100 px-4 py-2 text-sm font-medium text-accent-700 hover:bg-accent-300 disabled:opacity-40"
+        >
+          {adapting ? <Loader2 className="h-3 w-3 animate-spin" /> : <Wand2 className="h-3 w-3" />}
+          {adapting ? 'Adaptando…' : 'Adaptar plan con Claude'}
+        </button>
+      </div>
+
+      {adapted.length > 0 && (
+        <div className="mt-4 rounded-xl border border-accent-300 bg-accent-100/30 p-4">
+          <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-accent-700">
+            Plan adaptado · {adapted.length} sesiones
+          </div>
+          {adaptedRationale && <p className="mb-3 text-xs italic text-canvas-700">{adaptedRationale}</p>}
+          <ul className="space-y-2 text-sm">
+            {adapted.map((a, i) => (
+              <li key={i} className="flex items-start gap-2 text-canvas-900">
+                <span className="w-10 shrink-0 rounded bg-canvas-200 px-1 py-0.5 text-center font-mono text-[10px]">
+                  {a.day}
+                </span>
+                <span className="flex-1">{a.activity}</span>
+                <span className="text-[11px] text-canvas-500">{a.minutes} min</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   )
 }
