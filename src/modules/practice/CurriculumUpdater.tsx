@@ -12,7 +12,7 @@ export function CurriculumUpdater() {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch('/api/curriculum-check')
+      const res = await fetch('/api/curriculum-research')
       const data = await res.json()
       setResult(data)
     } catch (e) {

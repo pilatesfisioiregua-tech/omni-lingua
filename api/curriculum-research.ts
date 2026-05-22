@@ -1,8 +1,11 @@
 function env(name: string): string | undefined { const g = globalThis as { process?: { env: Record<string, string | undefined> } }; return g.process?.env?.[name] }
-/** Cron mensual · Claude Sonnet busca updates curriculum · F4.7 */
+/** Curriculum endpoint · GET check pending · POST research mensual Claude */
 import Anthropic from '@anthropic-ai/sdk'
 
-export default async function handler(_req: Request): Promise<Response> {
+export default async function handler(req: Request): Promise<Response> {
+  if (req.method === 'GET') {
+    return json({ updates_available: false, version: '0.0.0' })
+  }
   const key = env('ANTHROPIC_API_KEY')
   if (!key) {
     return json({ ok: true, proposed_changes: [], message: 'demo · sin API key' })
