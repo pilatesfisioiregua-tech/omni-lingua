@@ -1,4 +1,3 @@
-import process from 'node:process'
 /** Generative Comprehensible Input · mini-historia 200pal personalizada · Diferenciador #2 */
 import Anthropic from '@anthropic-ai/sdk'
 

@@ -1,4 +1,3 @@
-import process from 'node:process'
 /** Write→AI→Diff→Retry · Diferenciador #6 · corrige + explica + extrae errores */
 import Anthropic from '@anthropic-ai/sdk'
 

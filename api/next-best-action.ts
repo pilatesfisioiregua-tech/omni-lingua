@@ -1,4 +1,3 @@
-import process from 'node:process'
 /** Cross-skill recommendation engine · sugiere acción óptima basada en Twin + estado */
 import Anthropic from '@anthropic-ai/sdk'
 

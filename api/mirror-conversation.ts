@@ -1,4 +1,3 @@
-import process from 'node:process'
 /** Linguistic Mirror · Diferenciador #7 · detecta gap intención↔producción */
 import Anthropic from '@anthropic-ai/sdk'
 

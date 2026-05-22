@@ -1,4 +1,3 @@
-import process from 'node:process'
 /** GOP (Goodness of Pronunciation) backend · Diferenciador #3 · F1+ stub */
 
 export default async function handler(req: Request) {
