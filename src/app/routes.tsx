@@ -11,6 +11,7 @@ import {
   Camera,
   Sparkles,
   Settings as SettingsIcon,
+  Gift,
   Loader2,
 } from 'lucide-react'
 
@@ -39,6 +40,9 @@ const Performance = lazy(() =>
 )
 const Settings = lazy(() =>
   import('../modules/settings/Settings').then((m) => ({ default: m.Settings })),
+)
+const Wrapped = lazy(() =>
+  import('../modules/wrapped/Wrapped').then((m) => ({ default: m.Wrapped })),
 )
 
 function withSuspense(Comp: ComponentType): ComponentType {
@@ -163,6 +167,16 @@ export const ROUTES: RouteDef[] = [
     tagline: 'MediaPipe lips · GOP visual · autocrítica IA anti self-delusion',
   },
   {
+    path: '/wrapped',
+    label: 'Tu inglés en gráfica',
+    shortLabel: 'Wrapped',
+    icon: Gift,
+    phase: '5',
+    component: withSuspense(Wrapped),
+    group: 'system',
+    tagline: 'Tu Twin como Spotify Wrapped · 9 slides compartibles · €0 cliente',
+  },
+  {
     path: '/settings',
     label: 'Ajustes',
     shortLabel: 'Ajustes',
@@ -170,7 +184,7 @@ export const ROUTES: RouteDef[] = [
     phase: '5',
     component: withSuspense(Settings),
     group: 'system',
-    tagline: 'Theme · cronotipo (#10) · export JSON · subtitle companion (#8)',
+    tagline: 'Theme · cronotipo (#10) · notificaciones · export JSON · subtitle companion (#8)',
   },
 ]
 

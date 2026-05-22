@@ -1,0 +1,43 @@
+/* Omni-Lingua Subtitle Companion · overlay styles */
+
+.omni-known {
+  /* palabras conocidas · sin marcar */
+}
+
+.omni-unknown {
+  background-color: rgba(204, 120, 92, 0.25); /* coral Anthropic */
+  border-radius: 3px;
+  cursor: pointer;
+  padding: 0 2px;
+  transition: background-color 0.15s;
+}
+
+.omni-unknown:hover {
+  background-color: rgba(204, 120, 92, 0.5);
+}
+
+.omni-flash {
+  background-color: rgba(74, 124, 89, 0.5) !important;
+}
+
+.omni-toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: rgba(31, 28, 24, 0.95);
+  color: #f0eee6;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  z-index: 999999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.omni-toast-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
