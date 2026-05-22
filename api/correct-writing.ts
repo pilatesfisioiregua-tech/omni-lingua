@@ -1,4 +1,4 @@
-import { env } from './_env'
+import { env } from './_env.js'
 /** Write→AI→Diff→Retry · Diferenciador #6 · corrige + explica + extrae errores */
 import Anthropic from '@anthropic-ai/sdk'
 

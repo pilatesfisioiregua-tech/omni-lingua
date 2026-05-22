@@ -1,4 +1,4 @@
-import { env } from './_env'
+import { env } from './_env.js'
 /** Linguistic Mirror · Diferenciador #7 · detecta gap intención↔producción */
 import Anthropic from '@anthropic-ai/sdk'
 

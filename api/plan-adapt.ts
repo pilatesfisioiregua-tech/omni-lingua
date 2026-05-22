@@ -1,4 +1,4 @@
-import { env } from './_env'
+import { env } from './_env.js'
 /** WeeklyPlanCard · Claude reorganiza prioridades semanales · F4 */
 import Anthropic from '@anthropic-ai/sdk'
 

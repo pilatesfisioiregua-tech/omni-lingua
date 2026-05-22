@@ -1,4 +1,4 @@
-import { env } from './_env'
+import { env } from './_env.js'
 /** LLM estima CEFR de un transcript · F4.5 */
 import Anthropic from '@anthropic-ai/sdk'
 

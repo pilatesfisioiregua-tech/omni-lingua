@@ -1,4 +1,4 @@
-import { env } from './_env'
+import { env } from './_env.js'
 /**
  * Assistant sidebar endpoint · Anthropic streaming (modo demo si falta key).
  *

@@ -1,4 +1,4 @@
-import { env } from './_env'
+import { env } from './_env.js'
 /** CEFR auto-detect desde 1 grabación 30s · usado en Onboarding paso 4 */
 import Anthropic from '@anthropic-ai/sdk'
 

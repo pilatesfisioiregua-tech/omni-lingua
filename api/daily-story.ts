@@ -1,4 +1,4 @@
-import { env } from './_env'
+import { env } from './_env.js'
 /** Generative Comprehensible Input · mini-historia 200pal personalizada · Diferenciador #2 */
 import Anthropic from '@anthropic-ai/sdk'
 

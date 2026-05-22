@@ -1,4 +1,4 @@
-import { env } from './_env'
+import { env } from './_env.js'
 /** Cross-skill recommendation engine · sugiere acción óptima basada en Twin + estado */
 import Anthropic from '@anthropic-ai/sdk'
 

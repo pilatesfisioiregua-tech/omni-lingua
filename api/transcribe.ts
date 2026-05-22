@@ -1,4 +1,4 @@
-import { env } from './_env'
+import { env } from './_env.js'
 /** Modal Whisper transcribe · F4.5 stub */
 
 export default async function handler(req: Request) {

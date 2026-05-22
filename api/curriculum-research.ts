@@ -1,4 +1,4 @@
-import { env } from './_env'
+import { env } from './_env.js'
 /** Cron mensual · Claude Sonnet busca updates curriculum · F4.7 */
 import Anthropic from '@anthropic-ai/sdk'
 
